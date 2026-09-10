@@ -1,0 +1,207 @@
+Estandarizada e Interactiva de APIs con OpenAPI y Swagger
+Combina la teoría arquitectónica de las fuentes con la implementación práctica en PHP.
+ 
+1. ¿Qué es OpenAPI/Swagger? Estándar de documentación
+OpenAPI Specification (OAS): Es el estándar universal e independiente del lenguaje de programación para describir formalmente la estructura de APIs RESTful. Define mediante un contrato de datos formal (en formato JSON o YAML) todas las capacidades del servicio web: sus rutas o endpoints, métodos HTTP soportados (GET, POST, PUT, DELETE), parámetros de entrada, esquemas de datos (schemas) y los códigos de estado HTTP de respuesta (como 200 OK o 400 Bad Request).
+Swagger: Es el ecosistema de herramientas de código abierto diseñado para implementar la especificación OpenAPI. Mientras OpenAPI es la regla o formato abstracto, Swagger es la herramienta práctica (como Swagger UI o Swagger Editor) que toma esa definición y genera interfaces gráficas visuales y código fuente.
+
+2. Beneficios de documentar APIs automáticamente
+Sincronización constante (Código y Documentación en tiempo real): Al generar la documentación de forma automatizada a partir del código fuente, se elimina la brecha de desactualización común cuando se redactan manuales estáticos en PDF o Word.
+Aceleración del desarrollo e integración Cliente-Servidor: Provee a los desarrolladores del Front-end o aplicaciones móviles un contrato claro de entrada y salida de datos (mediante DTOs y serializadores) sin necesidad de consultar constantemente al equipo del Back-end.
+Consistencia y Estandarización: Garantiza que todos los endpoints utilicen de forma homogénea las cabeceras de autorización, tipos de contenido (application/json) y estructuras de error.
+ 
+3. Anotaciones y Atributos PHP para generar documentación
+En el ecosistema PHP moderno (a partir de PHP 8+), la librería estándar por excelencia es zircote/swagger-php. Permite redactar la especificación OpenAPI directamente sobre los controladores, métodos y clases mediante Atributos nativos de PHP 8 (#[OA\...]) o comentarios PHPDoc (@OA\...).
+A continuación, se presenta un ejemplo de cómo documentar un endpoint de catálogo en PHP:
+
+<?php
+namespace App\Http\Controllers;
+use OpenApi\Attributes as OA;
+
+#[OA\Info(
+    title: "API de Inventario Todologos",
+    version: "1.0.0",
+    description: "Servicio para la gestión de productos y stock en tiempo real"
+)]
+class ProductoController
+{
+    /**
+     * Endpoint para consultar la lista de productos
+     */
+    #[OA\Get(
+        path: "/api/productos",
+        summary: "Obtener catálogo de productos",
+        tags: ["Productos"]
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Lista de productos devuelta exitosamente en JSON",
+        content: new OA\JsonContent(
+            type: "array",
+            items: new OA\Items(ref: "#/components/schemas/Producto")
+        )
+    )]
+    #[OA\Response(
+        response: 500,
+        description: "Error interno del servidor o de base de datos"
+    )]
+    public function index()
+    {
+        // Lógica del controlador para consultar MariaDB mediante PDO...
+    }
+}
+
+#[OA\Info]: Establece el título general, versión y metas del proyecto.
+#[OA\Get]: Registra el punto de entrada (endpoint) y el método HTTP.
+#[OA\Response]: Detalla los códigos de estado devueltos y vincula la estructura del cuerpo JSON retornado (Payload).
+ 
+4. Endpoints interactivos: probar sin Postman
+Una de las ventajas principales de integrar la especificación OpenAPI es la habilitación de la interfaz Swagger UI:
+Punto de Acceso Gráfico: Al iniciar el servidor web local, la documentación interactiva se expone automáticamente en una ruta como /docs o /swagger.
+Pruebas en vivo ("Try it out"): Los desarrolladores pueden hacer clic en cualquier endpoint (ej. POST /api/ventas), completar los campos o parámetros requeridos directamente en la pantalla y presionar "Execute".
+Ejecución y Despliegue Transparente: La consola de Swagger UI realiza el fetch HTTP real hacia el servidor, mostrando en tiempo real la URL consultada, el código de estado retornado (ej. 200 OK) y la respuesta JSON exacta entregada por la base de datos.
+Reemplazo Eficiente de Clientes Externos: Permite auditar y validar la API de forma inmediata sin necesidad de instalar o configurar herramientas de terceros como Postman o depender de archivos de colección importados manualmente.
+
+Script Interactivo: generate-swagger.sh
+Crea un archivo llamado generate-swagger.sh en la raíz de tu proyecto PHP con el siguiente contenido:
+
+#!/usr/bin/env bash
+# =================================================================
+# Script Interactivo de Generación de Documentación OpenAPI con Swagger-PHP
+# =================================================================
+echo "=========================================================="
+echo " 🚀 Generador de Documentación OpenAPI/Swagger para PHP "
+echo "=========================================================="
+echo ""
+# 1. Comprobar la presencia de la CLI de swagger-php en vendor
+SWAGGER_BIN="./vendor/bin/openapi"
+if [ ! -f "$SWAGGER_BIN" ]; then
+    echo "❌ Error: No se encontró la herramienta CLI en '$SWAGGER_BIN'."
+    echo "💡 Asegúrate de haber instalado la librería ejecutando:"
+    echo "   composer require zircote/swagger-php"
+    exit 1
+fi
+# 2. Solicitar la carpeta donde residen los controladores y modelos
+read -p "📁 Directorio con código fuente PHP [Por defecto: app]: " SOURCE_DIR
+SOURCE_DIR=${SOURCE_DIR:-app}
+if [ ! -d "$SOURCE_DIR" ]; then
+    echo "⚠️ Advertencia: El directorio '$SOURCE_DIR' no existe en este proyecto."
+fi
+# 3. Elegir el formato del contrato (YAML o JSON)
+echo ""
+echo "📄 Selecciona el formato de salida:"
+echo "   1) YAML (Legible y limpio)"
+echo "   2) JSON (Formato liviano estándar)"
+read -p "Opción (1 o 2) [Por defecto: 1]: " FORMAT_OPT
+if [ "$FORMAT_OPT" == "2" ]; then
+    FORMAT="json"
+    DEFAULT_OUT="public/openapi.json"
+else
+    FORMAT="yaml"
+    DEFAULT_OUT="public/openapi.yaml"
+fi
+# 4. Definir la ruta de destino dentro de la carpeta pública
+read -p "💾 Ruta del archivo de salida [Por defecto: $DEFAULT_OUT]: " OUTPUT_FILE
+OUTPUT_FILE=${OUTPUT_FILE:-$DEFAULT_OUT}
+# Crear carpeta de destino si no existe
+OUT_DIR=$(dirname "$OUTPUT_FILE")
+if [ ! -d "$OUT_DIR" ]; then
+    echo "📂 Creando directorio de salida '$OUT_DIR'..."
+    mkdir -p "$OUT_DIR"
+fi
+# 5. Compilación del esquema OpenAPI
+echo ""
+echo "🔄 Escaneando atributos en '$SOURCE_DIR' y generando especificación..."
+# Ejecución de la CLI de swagger-php
+$SWAGGER_BIN "$SOURCE_DIR" --output "$OUTPUT_FILE" --format "$FORMAT"
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "----------------------------------------------------------"
+    echo "✅ ¡Documentación generada con éxito!"
+    echo "📍 Archivo guardado en: $OUTPUT_FILE"
+    echo "💡 Puedes cargar este archivo en Swagger UI para probar endpoints."
+    echo "----------------------------------------------------------"
+else
+    echo ""
+    echo "❌ Ocurrió un error al procesar las anotaciones/atributos PHP."
+fi
+
+Instrucciones de Uso Paso a Paso
+1. Dar permisos de ejecución al script: En tu terminal, otorga permisos de ejecución al archivo creado:
+chmod +x generate-swagger.sh
+
+2. Ejecutar el script:
+./generate-swagger.sh
+
+Ejemplo de ejecución interactiva:
+==========================================================
+ 🚀 Generador de Documentación OpenAPI/Swagger para PHP
+==========================================================
+📁 Directorio con código fuente PHP [Por defecto: app]: app/Http/Controllers
+📄 Selecciona el formato de salida:
+   1) YAML (Legible y limpio)
+   2) JSON (Formato liviano estándar)
+Opción (1 o 2) [Por defecto: 1]: 
+💾 Ruta del archivo de salida [Por defecto: public/openapi.yaml]: public/swagger.yaml
+🔄 Escaneando atributos en 'app/Http/Controllers' y generando especificación...
+✅ ¡Documentación generada con éxito!
+📍 Archivo guardado en: public/swagger.yaml
+💡 Puedes cargar este archivo en Swagger UI para probar endpoints.
+----------------------------------------------------------
+
+Integración Automática en composer.json
+Para no depender exclusivamente de la ejecución manual del script, puedes vincular este proceso al ciclo de comandos de Composer en tu archivo composer.json:
+{
+    "scripts": {
+        "generate-docs": "./generate-swagger.sh",
+        "post-autoload-dump": [
+            "@php -r "if (file_exists('generate-swagger.sh')) { passthru('./generate-swagger.sh'); }""
+        ]
+    }
+}
+De esta forma, cualquier desarrollador del equipo podrá regenerar la especificación en cualquier momento ejecutando simplemente:
+composer generate-docs
+ 
+PROYECTO INTEGRADOR: IMPLEMENTACIÓN DE API REST CON DOCUMENTACIÓN ESTANDARIZADA Y PRUEBAS INTERACTIVAS (OPENAPI/SWAGGER)
+Carrera: Ingeniería de Sistemas / Técnico Superior en Informática
+Nivel: Tercer Año
+Módulo: Arquitectura Backend y Servicios Web
+ 
+1. CONTEXTO Y JUSTIFICACIÓN TÉCNICA
+En el desarrollo de aplicaciones web y móviles modernas, las APIs REST actúan como la interfaz de comunicación fundamental entre el servidor y los clientes. Sin embargo, uno de los cuellos de botella más comunes en la industria es la falta de documentación actualizada o la desincronización entre el código fuente y las guías de integración.
+Para resolver este problema, el estándar internacional OpenAPI (Swagger) permite describir formalmente las capacidades de una API mediante contratos estructurados en formato JSON o YAML. La incorporación de atributos o anotaciones directamente en el código fuente (como los atributos de PHP 8 o FastAPI) permite autogenerar la documentación en tiempo real. Además, habilita una consola gráfica e interactiva (Swagger UI) donde es posible probar cada punto de entrada (endpoint) directamente desde el navegador, eliminando la necesidad obligatoria de herramientas externas de pruebas como Postman.
+ 
+2. OBJETIVO DEL PROYECTO
+Diseñar e implementar una API RESTful para un sistema de gestión empresarial (utilizando PHP con PDO y MariaDB, o FastAPI), incorporando la especificación OpenAPI/Swagger mediante atributos en el código fuente para garantizar la autogeneración de la documentación y la ejecución de pruebas interactivas en vivo.
+ 
+3. REQUERIMIENTOS DEL SISTEMA
+A. Requerimientos Funcionales (Lógica de Backend y Persistencia)
+El estudiante deberá implementar la arquitectura backend para un módulo de dominio (por ejemplo, el Sistema de Inventario y Ventas "OLYMPICUS"):
+Gestión de Catálogo (CRUD Completo): 
+GET /api/productos: Listar la totalidad de recursos almacenados.
+GET /api/productos/{id}: Consultar un recurso específico mediante su identificador único.
+POST /api/productos: Registrar un nuevo recurso procesando un payload JSON de entrada.
+PUT /api/productos/{id}: Actualizar la totalidad de los datos de un recurso existente.
+DELETE /api/productos/{id}: Eliminar de forma segura un recurso del sistema.
+Control de Estado Transaccional: 
+Implementar un endpoint transaccional (ej. POST /api/ventas) que procese operaciones de negocio y descuente o actualice el inventario en tiempo real.
+Persistencia y Seguridad en Base de Datos: 
+Gestionar la conexión a MariaDB utilizando PDO y sentencias preparadas (prepared statements) para neutralizar vulnerabilidades de Inyección SQL.
+
+B. Estándar de Documentación Automática (OpenAPI / Swagger)
+Anotaciones / Atributos en Código: 
+Configurar en el proyecto la librería de documentación (ej. zircote/swagger-php en PHP).
+Definir el bloque global de información (#[OA\Info]) especificado con título, versión y descripción técnica.
+Decorar cada controlador y método HTTP con sus respectivos atributos (#[OA\Get], #[OA\Post], #[OA\Put], #[OA\Delete]).
+Mapear las respuestas esperadas (#[OA\Response]) vinculando los Códigos de Estado HTTP (200 OK, 400 Bad Request, 404 Not Found, 500 Internal Error) y sus estructuras JSON (schemas).
+Generación del Esquema: 
+Compilar y exponer la especificación resultante (openapi.json o openapi.yaml) en la raíz del servidor web.
+
+C. Endpoints Interactivos (Pruebas sin Postman)
+Habilitar la consola gráfica de Swagger UI accesible desde la ruta /docs o /swagger.
+Verificar que cualquier cliente o evaluador pueda utilizar la función "Try it out", enviar parámetros o cuerpos JSON reales y observar la respuesta del servidor (código HTTP y JSON retornado) directamente en la interfaz web sin abrir Postman.
+ 
+4. FASES DE ENTREGA Y PRODUCTOS ESPERADOS
+Fase 1 (Código Fuente y Base de Datos): Repositorio del proyecto con la estructura de rutas, controladores y scripts de migración/SQL para MariaDB.
+Fase 2 (Contrato OpenAPI): Archivo openapi.json / openapi.yaml autogenerado a partir de la inspección del código fuente.
+Fase 3 (Demostración de Pruebas): Video corto o informe de capturas mostrando la ejecución exitosa de las operaciones CRUD (Creación, Lectura, Actualización y Borrado) ejecutadas exclusivamente desde la interfaz de Swagger UI.

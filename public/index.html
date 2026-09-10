@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OLYMPICUS API</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #0b1b3a 0%, #123a6b 100%);
+      color: #e6edf7;
+    }
+    main {
+      text-align: center;
+      max-width: 720px;
+      padding: 3rem 2rem;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+    h1 { margin: 0 0 0.5rem; font-size: 2.4rem; letter-spacing: 1px; }
+    h1 span { color: #4ec5ff; }
+    p.subtitle { opacity: 0.85; margin: 0 0 2rem; }
+    .links a {
+      display: inline-block;
+      margin: 0.4rem;
+      padding: 0.7rem 1.4rem;
+      border-radius: 999px;
+      background: #2b6cb0;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .links a:hover { background: #3273c9; }
+    .links a.secondary {
+      background: transparent;
+      border: 1px solid #4ec5ff;
+      color: #4ec5ff;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>OLYMPICUS<span>API</span></h1>
+    <p class="subtitle">Sistema de Inventario y Ventas · REST + OpenAPI/Swagger · 24/7 en Cloudflare Workers</p>
+    <nav class="links">
+      <a href="/docs">Documentación interactiva (Swagger UI)</a><br>
+      <a class="secondary" href="/openapi.json">openapi.json</a>
+      <a class="secondary" href="/openapi.yaml">openapi.yaml</a>
+    </nav>
+  </main>
+</body>
+</html>

@@ -1,0 +1,900 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API OLYMPICUS — Sistema de Inventario y Ventas",
+    "version": "1.0.0",
+    "description": "API RESTful para la gestión de productos y stock en tiempo real, documentada con el estándar OpenAPI. Incluye CRUD de catálogo y un endpoint transaccional de ventas que descuenta inventario de forma atómica."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "components": {
+    "schemas": {},
+    "parameters": {}
+  },
+  "paths": {
+    "/api/productos": {
+      "get": {
+        "tags": [
+          "Productos"
+        ],
+        "summary": "Obtener catálogo de productos",
+        "responses": {
+          "200": {
+            "description": "Catálogo completo devuelto en JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "exclusiveMinimum": true,
+                        "example": 1
+                      },
+                      "nombre": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 120,
+                        "example": "Smart TV 50\" 4K"
+                      },
+                      "descripcion": {
+                        "type": "string",
+                        "nullable": true,
+                        "maxLength": 500,
+                        "example": "Televisor LED 4K UltraHD con HDR"
+                      },
+                      "precio": {
+                        "type": "number",
+                        "minimum": 0,
+                        "example": 5499.99
+                      },
+                      "stock": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "example": 20
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "example": "2026-01-01T12:00:00.000Z"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "example": "2026-01-01T12:00:00.000Z"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "nombre",
+                      "descripcion",
+                      "precio",
+                      "stock",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Productos"
+        ],
+        "summary": "Registrar un nuevo producto",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "example": "Smart TV 50\" 4K"
+                  },
+                  "descripcion": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500,
+                    "example": "Televisor LED 4K UltraHD con HDR"
+                  },
+                  "precio": {
+                    "type": "number",
+                    "minimum": 0,
+                    "example": 5499.99
+                  },
+                  "stock": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "example": 20
+                  }
+                },
+                "required": [
+                  "nombre",
+                  "descripcion",
+                  "precio",
+                  "stock"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Producto creado correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true,
+                      "example": 1
+                    },
+                    "nombre": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 120,
+                      "example": "Smart TV 50\" 4K"
+                    },
+                    "descripcion": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 500,
+                      "example": "Televisor LED 4K UltraHD con HDR"
+                    },
+                    "precio": {
+                      "type": "number",
+                      "minimum": 0,
+                      "example": 5499.99
+                    },
+                    "stock": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "example": 20
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "example": "2026-01-01T12:00:00.000Z"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "example": "2026-01-01T12:00:00.000Z"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nombre",
+                    "descripcion",
+                    "precio",
+                    "stock",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Payload JSON inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/productos/{id}": {
+      "get": {
+        "tags": [
+          "Productos"
+        ],
+        "summary": "Consultar un producto por su identificador único",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Producto encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true,
+                      "example": 1
+                    },
+                    "nombre": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 120,
+                      "example": "Smart TV 50\" 4K"
+                    },
+                    "descripcion": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 500,
+                      "example": "Televisor LED 4K UltraHD con HDR"
+                    },
+                    "precio": {
+                      "type": "number",
+                      "minimum": 0,
+                      "example": 5499.99
+                    },
+                    "stock": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "example": 20
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "example": "2026-01-01T12:00:00.000Z"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "example": "2026-01-01T12:00:00.000Z"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nombre",
+                    "descripcion",
+                    "precio",
+                    "stock",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Identificador inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Producto no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Productos"
+        ],
+        "summary": "Actualizar la totalidad de los datos de un producto",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120,
+                    "example": "Smart TV 50\" 4K"
+                  },
+                  "descripcion": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500,
+                    "example": "Televisor LED 4K UltraHD con HDR"
+                  },
+                  "precio": {
+                    "type": "number",
+                    "minimum": 0,
+                    "example": 5499.99
+                  },
+                  "stock": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "example": 20
+                  }
+                },
+                "required": [
+                  "nombre",
+                  "descripcion",
+                  "precio",
+                  "stock"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Producto actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true,
+                      "example": 1
+                    },
+                    "nombre": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 120,
+                      "example": "Smart TV 50\" 4K"
+                    },
+                    "descripcion": {
+                      "type": "string",
+                      "nullable": true,
+                      "maxLength": 500,
+                      "example": "Televisor LED 4K UltraHD con HDR"
+                    },
+                    "precio": {
+                      "type": "number",
+                      "minimum": 0,
+                      "example": 5499.99
+                    },
+                    "stock": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "example": 20
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "example": "2026-01-01T12:00:00.000Z"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "example": "2026-01-01T12:00:00.000Z"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nombre",
+                    "descripcion",
+                    "precio",
+                    "stock",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Payload JSON inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Producto no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Productos"
+        ],
+        "summary": "Eliminar un producto del sistema",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "example": "1"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Producto eliminado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Identificador inválido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Producto no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ventas": {
+      "post": {
+        "tags": [
+          "Ventas"
+        ],
+        "summary": "Registrar una venta y descontar inventario en tiempo real",
+        "description": "Operación transaccional: valida stock disponible, registra la venta y sus detalles, y descuenta el inventario de forma atómica. Si el stock no alcanza, la venta no se registra.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "producto_id": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "exclusiveMinimum": true,
+                          "example": 1
+                        },
+                        "cantidad": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "exclusiveMinimum": true,
+                          "example": 2
+                        }
+                      },
+                      "required": [
+                        "producto_id",
+                        "cantidad"
+                      ]
+                    },
+                    "minItems": 1,
+                    "description": "Detalle de la venta (al menos un ítem)"
+                  }
+                },
+                "required": [
+                  "items"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Venta registrada y stock actualizado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true,
+                      "example": 1
+                    },
+                    "total": {
+                      "type": "number",
+                      "minimum": 0,
+                      "example": 10999.98
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "example": "2026-01-01T12:00:00.000Z"
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "producto_id": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "exclusiveMinimum": true,
+                            "example": 1
+                          },
+                          "cantidad": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "exclusiveMinimum": true,
+                            "example": 2
+                          },
+                          "precio_unitario": {
+                            "type": "number",
+                            "minimum": 0,
+                            "example": 5499.99
+                          }
+                        },
+                        "required": [
+                          "producto_id",
+                          "cantidad",
+                          "precio_unitario"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "total",
+                    "created_at",
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stock insuficiente o cantidad inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Producto inexistente en el catálogo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "example": "STOCK_INSUFICIENTE"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stock insuficiente"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

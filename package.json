@@ -1,0 +1,37 @@
+{
+  "name": "olympus-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "API REST de inventario y ventas con OpenAPI/Swagger, alojada en Cloudflare Workers con Supabase",
+  "scripts": {
+    "dev": "wrangler dev",
+    "setup-swagger": "node scripts/copy-swagger-ui.mjs",
+    "generate-docs": "tsx src/swagger/generate.ts",
+    "migrate": "tsx scripts/run-migration.ts",
+    "build": "npm run setup-swagger && npm run generate-docs",
+    "check": "tsc --noEmit",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^1.6.3",
+    "@neondatabase/serverless": "^1.1.0",
+    "hono": "^4.13.7",
+    "swagger-ui-dist": "^5.32.15",
+    "yaml": "^2.9.0",
+    "zod": "^4.6.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260910.1",
+    "@types/node": "^22.20.2",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.131.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "esbuild@0.28.1": true,
+    "workerd@1.20260910.1": true,
+    "@scarf/scarf@1.4.0": true
+  }
+}
