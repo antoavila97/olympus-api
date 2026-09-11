@@ -44,6 +44,62 @@
       color: #4ec5ff;
     }
   </style>
+  <style>
+    #verificar {
+      max-width: 720px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    #verificar h2 {
+      margin-top: 0;
+      color: #4ec5ff;
+    }
+    .buscador {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .buscador input {
+      flex: 1;
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 1rem;
+    }
+    .buscador button {
+      padding: 0.7rem 1.2rem;
+      border-radius: 8px;
+      border: none;
+      background: #2b6cb0;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .buscador button:hover {
+      background: #3273c9;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    th {
+      color: #4ec5ff;
+      font-weight: 600;
+    }
+    .error {
+      color: #ff6b6b;
+    }
+  </style>
 </head>
 <body>
   <main>
@@ -55,5 +111,100 @@
       <a class="secondary" href="/openapi.yaml">openapi.yaml</a>
     </nav>
   </main>
+
+  <section id="verificar">
+    <h2>Verificar Productos</h2>
+    <div class="buscador">
+      <input type="number" id="buscarId" placeholder="Buscar por ID">
+      <button onclick="buscarProducto()">Buscar</button>
+      <button onclick="cargarTodos()">Ver todos</button>
+    </div>
+    <div id="resultado"></div>
+  </section>
+
+  <script>
+    async function cargarTodos() {
+      const div = document.getElementById('resultado');
+      div.innerHTML = 'Cargando...';
+      try {
+        const res = await fetch('/api/productos');
+        if (!res.ok) throw new Error('Error al cargar');
+        const data = await res.json();
+        if (data.length === 0) {
+          div.innerHTML = '<p>No hay productos registrados</p>';
+          return;
+        }
+        div.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.map(p => `
+                <tr>
+                  <td>${p.id}</td>
+                  <td>${p.nombre}</td>
+                  <td>${p.descripcion || '-'}</td>
+                  <td>$${p.precio.toFixed(2)}</td>
+                  <td>${p.stock}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (e) {
+        div.innerHTML = '<p class="error">Error al cargar los productos</p>';
+      }
+    }
+
+    async function buscarProducto() {
+      const id = document.getElementById('buscarId').value;
+      const div = document.getElementById('resultado');
+      if (!id) {
+        div.innerHTML = '<p class="error">Ingrese un ID válido</p>';
+        return;
+      }
+      div.innerHTML = 'Buscando...';
+      try {
+        const res = await fetch(`/api/productos/${id}`);
+        if (res.status === 404) {
+          div.innerHTML = '<p class="error">Producto no encontrado</p>';
+          return;
+        }
+        if (!res.ok) throw new Error('Error al buscar');
+        const p = await res.json();
+        div.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${p.id}</td>
+                <td>${p.nombre}</td>
+                <td>${p.descripcion || '-'}</td>
+                <td>$${p.precio.toFixed(2)}</td>
+                <td>${p.stock}</td>
+              </tr>
+            </tbody>
+          </table>
+        `;
+      } catch (e) {
+        div.innerHTML = '<p class="error">Error al buscar el producto</p>';
+      }
+    }
+  </script>
 </body>
 </html>

@@ -20,7 +20,8 @@ export const docsHtml = `<!doctype html>
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [SwaggerUIBundle.presets.apis],
-        layout: 'BaseLayout'
+        layout: 'BaseLayout',
+        lang: 'es'
       })
     }
   </script>
