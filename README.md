@@ -2,7 +2,7 @@
 
 **Proyecto Integrador · Arquitectura Backend y Servicios Web · Tercer Año**
 
-API RESTful de **inventario y ventas**, documentada con el estándar **OpenAPI** y probada desde una consola **Swagger UI interactiva** sin necesidad de Postman. Alojada **24/7 en Cloudflare Workers** con base de datos **Neon (PostgreSQL serverless)** y desplegada desde **GitHub**.
+API RESTful de **inventario y ventas**, documentada con el estándar **OpenAPI** y probada desde una consola **Swagger UI interactiva** sin necesidad de Postman. Alojada **24/7 en Cloudflare Workers** con base de datos **Neon (PostgreSQL serverless)** y versionada en **GitHub**.
 
 > ## 🌐 ENLACES DE LA API (en vivo)
 >
@@ -20,7 +20,7 @@ API RESTful de **inventario y ventas**, documentada con el estándar **OpenAPI**
 | Modelado + Docs | **@hono/zod-openapi** | Esquemas y endpoints anotados en el código → `openapi.json`/`.yaml` autogenerados |
 | Consola interactiva | **Swagger UI** (`/docs`) | Botón "Try it out" → ejecuta el HTTP real contra el servidor |
 | Base de datos | **Neon / PostgreSQL** serverless | Persistencia con SQL parametrizado (**sentencias preparadas**) |
-| Repo + CI/CD | **GitHub** | Control de versiones; Cloudflare despliega desde el repo |
+| Repositorio | **GitHub** | Control de versiones e historial del proyecto |
 
 ### ¿Cómo cumple el enunciado?
 
@@ -150,9 +150,9 @@ wrangler secret put DATABASE_URL     # guarda la connection string (secreto)
 wrangler deploy                      # publica en https://olympus-api.aaahurtado36h.workers.dev
 ```
 
-### CI/CD desde GitHub
+### Repositorio en GitHub
 
-Al hacer `git push` a `main`, Cloudflare despliega la última versión automáticamente.
+El código fuente del proyecto está publicado en GitHub (repositorio `antoavila97/olympus-api`). El despliegue a Cloudflare Workers se hace a mano desde la terminal con `wrangler deploy` (o `npm run deploy`).
 
 ## 6. Demo para la entrega (Fase 3)
 
