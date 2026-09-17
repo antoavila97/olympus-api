@@ -8,21 +8,15 @@
     body {
       margin: 0;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       background: linear-gradient(135deg, #0b1b3a 0%, #123a6b 100%);
       color: #e6edf7;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     }
     main {
       text-align: center;
-      max-width: 720px;
-      padding: 3rem 2rem;
-      background: rgba(255, 255, 255, 0.06);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 2rem 1rem;
     }
     h1 { margin: 0 0 0.5rem; font-size: 2.4rem; letter-spacing: 1px; }
     h1 span { color: #4ec5ff; }
@@ -43,36 +37,23 @@
       border: 1px solid #4ec5ff;
       color: #4ec5ff;
     }
-  </style>
-  <style>
-    #verificar {
-      max-width: 720px;
+    section {
+      max-width: 900px;
       margin: 2rem auto;
       padding: 2rem;
       background: rgba(255, 255, 255, 0.06);
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.14);
     }
-    #verificar h2 {
-      margin-top: 0;
-      color: #4ec5ff;
-    }
-    .buscador {
+    section h2 { margin-top: 0; color: #4ec5ff; }
+    .encabezado-catalogo {
       display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
     }
-    .buscador input {
-      flex: 1;
-      padding: 0.7rem 1rem;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      font-size: 1rem;
-    }
-    .buscador button {
-      padding: 0.7rem 1.2rem;
+    .encabezado-catalogo button {
+      padding: 0.6rem 1.2rem;
       border-radius: 8px;
       border: none;
       background: #2b6cb0;
@@ -80,131 +61,185 @@
       font-weight: 600;
       cursor: pointer;
     }
-    .buscador button:hover {
-      background: #3273c9;
+    .encabezado-catalogo button:hover { background: #3273c9; }
+    .stats {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .stat {
+      flex: 1;
+      min-width: 180px;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      text-align: center;
     }
+    .stat strong { display: block; font-size: 1.6rem; color: #4ec5ff; }
+    .stat span { font-size: 0.85rem; opacity: 0.85; }
+    table { width: 100%; border-collapse: collapse; }
     th, td {
       padding: 0.8rem;
       text-align: left;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-    th {
-      color: #4ec5ff;
+    th { color: #4ec5ff; font-weight: 600; white-space: nowrap; }
+    tr:hover td { background: rgba(255, 255, 255, 0.03); }
+    .error { color: #ff6b6b; }
+    .aviso { font-size: 0.85rem; opacity: 0.75; margin-bottom: 1rem; }
+    form { display: grid; gap: 1rem; }
+    .campo { display: flex; flex-direction: column; gap: 0.3rem; }
+    .campo label { font-size: 0.85rem; opacity: 0.85; }
+    .campo input {
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 1rem;
+    }
+    .campo input:focus { outline: none; border-color: #4ec5ff; }
+    form button {
+      padding: 0.8rem 1.2rem;
+      border-radius: 999px;
+      border: none;
+      background: #2b6cb0;
+      color: #fff;
       font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
     }
-    .error {
-      color: #ff6b6b;
-    }
+    form button:hover { background: #3273c9; }
+    #mensaje-crear { font-size: 0.9rem; min-height: 1.2em; }
   </style>
 </head>
 <body>
   <main>
     <h1>OLYMPICUS<span>API</span></h1>
-    <p class="subtitle">Sistema de Inventario y Ventas · REST + OpenAPI/Swagger · 24/7 en Cloudflare Workers</p>
+    <p class="subtitle">Sistema de Inventario y Ventas · REST + OpenAPI/Swagger</p>
     <nav class="links">
-      <a href="/docs">Documentación interactiva (Swagger UI)</a><br>
+      <a href="/docs">Documentación interactiva (Swagger UI)</a>
       <a class="secondary" href="/openapi.json">openapi.json</a>
       <a class="secondary" href="/openapi.yaml">openapi.yaml</a>
     </nav>
   </main>
 
-  <section id="verificar">
-    <h2>Verificar Productos</h2>
-    <div class="buscador">
-      <input type="number" id="buscarId" placeholder="Buscar por ID">
-      <button onclick="buscarProducto()">Buscar</button>
-      <button onclick="cargarTodos()">Ver todos</button>
+  <section id="catalogo">
+    <div class="encabezado-catalogo">
+      <h2>Catálogo completo</h2>
+      <button onclick="cargarCatalogo()">Actualizar</button>
     </div>
-    <div id="resultado"></div>
+    <div class="stats" id="stats">
+      <p>Cargando catálogo…</p>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Creado</th>
+        </tr>
+      </thead>
+      <tbody id="catalogo-tbody"></tbody>
+    </table>
+  </section>
+
+  <section id="crear-producto">
+    <h2>Crear producto</h2>
+    <p class="aviso">Si tenés esta página abierta en otra ventana, el producto aparece allí automáticamente.</p>
+    <form id="form-crear" onsubmit="crearProducto(event)">
+      <div class="campo">
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" name="nombre" required maxlength="120">
+      </div>
+      <div class="campo">
+        <label for="descripcion">Descripción</label>
+        <input type="text" id="descripcion" name="descripcion" maxlength="500">
+      </div>
+      <div class="campo">
+        <label for="precio">Precio</label>
+        <input type="number" id="precio" name="precio" min="0" step="0.01" required>
+      </div>
+      <div class="campo">
+        <label for="stock">Stock</label>
+        <input type="number" id="stock" name="stock" min="0" step="1" required>
+      </div>
+      <button type="submit">Crear producto</button>
+      <p id="mensaje-crear"></p>
+    </form>
   </section>
 
   <script>
-    async function cargarTodos() {
-      const div = document.getElementById('resultado');
-      div.innerHTML = 'Cargando...';
+    async function cargarCatalogo() {
+      const stats = document.getElementById('stats');
+      const tbody = document.getElementById('catalogo-tbody');
+      stats.innerHTML = '<p>Cargando catálogo…</p>';
+      tbody.innerHTML = '';
       try {
         const res = await fetch('/api/productos');
         if (!res.ok) throw new Error('Error al cargar');
         const data = await res.json();
+        const unidades = data.reduce((s, p) => s + p.stock, 0);
+        const valor = data.reduce((s, p) => s + p.precio * p.stock, 0);
+        stats.innerHTML = `
+          <div class="stat"><strong>${data.length}</strong><span>Productos</span></div>
+          <div class="stat"><strong>${unidades}</strong><span>Unidades en stock</span></div>
+          <div class="stat"><strong>$${valor.toFixed(2)}</strong><span>Valor del inventario</span></div>
+        `;
         if (data.length === 0) {
-          div.innerHTML = '<p>No hay productos registrados</p>';
+          tbody.innerHTML = '<tr><td colspan="6">No hay productos registrados</td></tr>';
           return;
         }
-        div.innerHTML = `
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Precio</th>
-                <th>Stock</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${data.map(p => `
-                <tr>
-                  <td>${p.id}</td>
-                  <td>${p.nombre}</td>
-                  <td>${p.descripcion || '-'}</td>
-                  <td>$${p.precio.toFixed(2)}</td>
-                  <td>${p.stock}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        `;
+        tbody.innerHTML = data.map(p => `
+          <tr>
+            <td>${p.id}</td>
+            <td>${p.nombre}</td>
+            <td>${p.descripcion || '-'}</td>
+            <td>$${p.precio.toFixed(2)}</td>
+            <td>${p.stock}</td>
+            <td>${new Date(p.created_at).toLocaleString()}</td>
+          </tr>
+        `).join('');
       } catch (e) {
-        div.innerHTML = '<p class="error">Error al cargar los productos</p>';
+        stats.innerHTML = '<p class="error">No se pudo cargar el catálogo</p>';
       }
     }
 
-    async function buscarProducto() {
-      const id = document.getElementById('buscarId').value;
-      const div = document.getElementById('resultado');
-      if (!id) {
-        div.innerHTML = '<p class="error">Ingrese un ID válido</p>';
-        return;
-      }
-      div.innerHTML = 'Buscando...';
+    async function crearProducto(e) {
+      e.preventDefault();
+      const mensaje = document.getElementById('mensaje-crear');
+      const form = e.target;
+      const payload = {
+        nombre: form.nombre.value.trim(),
+        descripcion: form.descripcion.value.trim() || null,
+        precio: Number(form.precio.value),
+        stock: Number(form.stock.value),
+      };
       try {
-        const res = await fetch(`/api/productos/${id}`);
-        if (res.status === 404) {
-          div.innerHTML = '<p class="error">Producto no encontrado</p>';
+        const res = await fetch('/api/productos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => null);
+          mensaje.innerHTML = '<span class="error">Error: ' + (err && err.message ? err.message : 'no se pudo crear el producto') + '</span>';
           return;
         }
-        if (!res.ok) throw new Error('Error al buscar');
-        const p = await res.json();
-        div.innerHTML = `
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Precio</th>
-                <th>Stock</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>${p.id}</td>
-                <td>${p.nombre}</td>
-                <td>${p.descripcion || '-'}</td>
-                <td>$${p.precio.toFixed(2)}</td>
-                <td>${p.stock}</td>
-              </tr>
-            </tbody>
-          </table>
-        `;
+        form.reset();
+        mensaje.innerHTML = 'Producto creado correctamente';
+        cargarCatalogo();
       } catch (e) {
-        div.innerHTML = '<p class="error">Error al buscar el producto</p>';
+        mensaje.innerHTML = '<span class="error">Error: no se pudo crear el producto</span>';
       }
     }
+
+    cargarCatalogo();
   </script>
 </body>
 </html>
