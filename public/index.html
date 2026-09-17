@@ -121,8 +121,6 @@
     <p class="subtitle">Sistema de Inventario y Ventas · REST + OpenAPI/Swagger</p>
     <nav class="links">
       <a href="/docs">Documentación interactiva (Swagger UI)</a>
-      <a class="secondary" href="/openapi.json">openapi.json</a>
-      <a class="secondary" href="/openapi.yaml">openapi.yaml</a>
     </nav>
   </main>
 
@@ -189,7 +187,7 @@
         stats.innerHTML = `
           <div class="stat"><strong>${data.length}</strong><span>Productos</span></div>
           <div class="stat"><strong>${unidades}</strong><span>Unidades en stock</span></div>
-          <div class="stat"><strong>$${valor.toFixed(2)}</strong><span>Valor del inventario</span></div>
+          <div class="stat"><strong>$${valor.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong><span>Valor del inventario</span></div>
         `;
         if (data.length === 0) {
           tbody.innerHTML = '<tr><td colspan="6">No hay productos registrados</td></tr>';
@@ -200,7 +198,7 @@
             <td>${p.id}</td>
             <td>${p.nombre}</td>
             <td>${p.descripcion || '-'}</td>
-            <td>$${p.precio.toFixed(2)}</td>
+            <td>$${p.precio.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
             <td>${p.stock}</td>
             <td>${new Date(p.created_at).toLocaleString()}</td>
           </tr>
